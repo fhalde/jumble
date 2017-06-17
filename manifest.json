@@ -1,0 +1,14 @@
+{
+  "manifest_version": 2,
+  "name": "Jumble",
+  "description": "Jumble tabs so that same domain tabs come closer.",
+  "version": "1.0",
+  "browser_action": {
+  },
+  "permissions": [
+          "tabs"
+  ],
+  "background": {
+    "scripts": ["jumble.js"]
+  }
+}
