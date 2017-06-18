@@ -18,15 +18,18 @@ function getTabs() {
 
 function jumble([windows, tabs]) {
     let windowTabCount = initializeWindowTabCount(windows);
-    console.log(windowTabCount);
     let tabGroup = groupBy(domain, tabs);
 
     let windowsToTabs = {};
     for (let domain in tabGroup) {
         let w = leastCount(windowTabCount);
         w['tabcount'] += tabGroup[domain].length;
-        chrome.tabs.move([...tabGroup[domain].map(t => t.id)], { "windowId": parseInt(w['id'], 10), index: -1 });
+        chrome.tabs.move([...tabGroup[domain].map(t => t.id)], toWindow(w));
     }
+}
+
+function toWindow(w) {
+		return { "windowId": parseInt(w['id'], 10), index: -1 };
 }
 
 function initializeWindowTabCount(windows) {
