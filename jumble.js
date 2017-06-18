@@ -21,11 +21,18 @@ function jumble([windows, tabs]) {
     let tabGroup = groupBy(domain, tabs);
 
     let windowsToTabs = {};
-    for (let domain in tabGroup) {
+    let domains = getOrderedDomains(tabGroup);
+    for (let i in domains) {
         let w = leastCount(windowTabCount);
-        w['tabcount'] += tabGroup[domain].length;
-        chrome.tabs.move([...tabGroup[domain].map(t => t.id)], toWindow(w));
+        w['tabcount'] += tabGroup[domains[i]].length;
+        chrome.tabs.move([...tabGroup[domains[i]].map(t => t.id)], toWindow(w));
     }
+}
+
+function getOrderedDomains(tabGroup) {
+		let d = Object.keys(tabGroup);
+		d.sort();
+		return d;
 }
 
 function toWindow(w) {
