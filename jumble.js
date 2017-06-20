@@ -22,35 +22,18 @@ function jumble([windows, tabs]) {
 
     let windowsToTabs = {};
     let domains = getOrderedDomains(tabGroup);
-    for (let i in domains) {
+    domains.forEach(domain => {
         let w = leastCount(windowTabCount);
-        w['tabcount'] += tabGroup[domains[i]].length;
-        chrome.tabs.move([...tabGroup[domains[i]].map(t => t.id)], toWindow(w));
-    }
-}
-
-function getOrderedDomains(tabGroup) {
-		let d = Object.keys(tabGroup);
-		d.sort();
-		return d;
-}
-
-function toWindow(w) {
-		return { "windowId": parseInt(w['id'], 10), index: -1 };
+        w['tabcount'] += tabGroup[domain].length;
+        chrome.tabs.move([...tabGroup[domain].map(t => t.id)], toWindow(w));
+    });
 }
 
 function initializeWindowTabCount(windows) {
     return windows.reduce((a, w) => {
-        a[w.id] = {
-            'tabcount': 0,
-            'id': w.id
-        }
+        a.push({ 'tabcount': 0, 'id': w.id });
         return a;
-    }, {});
-}
-
-function domain(t) {
-    return t.url.split('/')[2];
+    }, []);
 }
 
 function groupBy(f, arr) {
@@ -61,14 +44,18 @@ function groupBy(f, arr) {
     }, {});
 }
 
+function domain(t) {
+    return t.url.split('/')[2];
+}
+
+function getOrderedDomains(tabGroup) {
+    return Object.keys(tabGroup).sort();
+}
+
 function leastCount(windowTabCount) {
-    let min = 99999999999;
-    let win = undefined;
-    for (let w in windowTabCount) {
-        if (windowTabCount[w]['tabcount'] < min) {
-            min = windowTabCount[w]['tabcount'];
-            win = windowTabCount[w];
-        }
-    }
-    return win;
+    return windowTabCount.reduce((acc, w) => acc['tabcount'] < w['tabcount'] ? acc : w);
+}
+
+function toWindow(w) {
+    return { "windowId": parseInt(w['id'], 10), index: -1 };
 }
